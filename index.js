@@ -34,67 +34,27 @@ class Player extends Entity{
 
 //class enemy
 class Enemy extends Projectile {
-
     constructor(x, y, radius, color, velocity) {
-
         super(x, y, radius, color, velocity);
-
-    }
-
-}
-
-const player = new Player(canvas.width / 2, canvas.height / 2, 10, "red");
-player.draw();
-
-//class projectile
-class Projectile extends Player {
-    constructor(x, y, radius, color, velocity) {
-        super(x, y, radius, color);
-        this.velocity = velocity;
-    }
-
-    update() {
-        this.draw();
-        this.x = this.x + this.velocity.x;
-        this.y = this.y + this.velocity.y;
     }
 }
 
-const projectile = new Projectile(50, 50, 30, "blue", {x: 3, y: 3});
-projectile.draw();
-//étape 3
+const player = new Player(canvas.width / 2, canvas.height / 2, 10, "blue");
+
 const projectiles = [];
 
-window.addEventListener("click", (event) => {
-    const angle = Math.atan2(
-        event.clientY - player.y,
-        event.clientX - player.x
-    );
-    const velocity = {
-        x: Math.cos(angle) * 5,
-        y: Math.sin(angle) * 5,
-    };
+const enemies = [];
 
-    const projectile = new Projectile(
-        player.x,
-        player.y,
-        5,
-        "white",
-        velocity
-    );
-    projectiles.push(projectile);
-    projectile.draw();
-});
-
-//fonction animate
 function animate() {
     requestAnimationFrame(animate);
 
-    ctx.fillStyle = "rgba(0, 0, 0, 1)";
+    ctx.fillStyle = "rgba(0, 0, 0, 0.1)";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     player.draw();
 
     projectiles.forEach((projectile) => projectile.update());
+
+    enemies.forEach((enemy) => enemy.update());
 }
 animate();
