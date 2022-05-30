@@ -36,6 +36,7 @@ const player = new Player(canvas.width / 2, canvas.height / 2, 10, "red");
 player.draw();
 
 //const projectiles
+
 const projectiles = [];
 
 window.addEventListener("click", (event) => {
@@ -58,6 +59,35 @@ window.addEventListener("click", (event) => {
     projectiles.push(projectile);
     projectile.draw();
 });
+
+//class Projectile
+
+class Projectile extends Player {
+    constructor(x, y, radius, color, velocity) {
+        super(x, y, radius, color);
+        this.velocity = velocity;
+    }
+
+    update() {
+        this.draw();
+        this.x = this.x + this.velocity.x;
+        this.y = this.y + this.velocity.y;
+    }
+}
+
+// function animate
+
+function animate() {
+    requestAnimationFrame(animate);
+
+    ctx.fillStyle = "rgba(0, 0, 0, 1)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    player.draw();
+
+    projectiles.forEach((projectile) => projectile.update());
+}
+animate();
 
 //function spawnEnemies
 
