@@ -4,6 +4,7 @@ const canvas = document.getElementById('game-container');
 canvas.width = innerWidth;
 canvas.height = innerHeight;
 
+//appi canvas
 const ctx = canvas.getContext('2d');
 
 
@@ -24,6 +25,7 @@ class Entity {
         ctx.fill();
     }
 }
+// class player
 
 class Player extends Entity{
     constructor(x, y, radius, color) {
@@ -31,6 +33,7 @@ class Player extends Entity{
         this.color = color;
     }
 }
+// class projectile
 
 class Projectile extends Player {
     constructor(x, y, radius, color, velocity) {
@@ -45,11 +48,15 @@ class Projectile extends Player {
     }
 }
 
+// class enemy
+
 class Enemy extends Projectile {
     constructor(x, y, radius, color, velocity) {
         super(x, y, radius, color, velocity);
     }
 }
+
+// class particle
 
 class Particle extends Enemy {
     constructor(x, y, radius, color, velocity) {
