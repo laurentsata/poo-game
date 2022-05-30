@@ -1,9 +1,13 @@
-const canvas = document.querySelector("#game-container");
-const ctx = canvas.getContext("2d");
+const canvas = document.getElementById('game-container');
+// const canvas = document.querySelector('#game-container');
 
 canvas.width = innerWidth;
 canvas.height = innerHeight;
 
+const ctx = canvas.getContext('2d');
+
+
+//class
 
 class Entity {
     constructor(x, y, radius) {
@@ -28,36 +32,6 @@ class Player extends Entity{
     }
 }
 
-const player = new Player(canvas.width / 2, canvas.height / 2, 10, "red");
-player.draw();
-
-//const projectiles
-
-const projectiles = [];
-
-window.addEventListener("click", (event) => {
-    const angle = Math.atan2(
-        event.clientY - player.y,
-        event.clientX - player.x
-    );
-    const velocity = {
-        x: Math.cos(angle) * 5,
-        y: Math.sin(angle) * 5,
-    };
-
-    const projectile = new Projectile(
-        player.x,
-        player.y,
-        5,
-        "white",
-        velocity
-    );
-    projectiles.push(projectile);
-    projectile.draw();
-});
-
-//class Projectile
-
 class Projectile extends Player {
     constructor(x, y, radius, color, velocity) {
         super(x, y, radius, color);
@@ -71,13 +45,37 @@ class Projectile extends Player {
     }
 }
 
-// function animate
-
 class Enemy extends Projectile {
     constructor(x, y, radius, color, velocity) {
         super(x, y, radius, color, velocity);
     }
 }
+
+class Particle extends Enemy {
+    constructor(x, y, radius, color, velocity) {
+      super(x, y, radius, color, velocity);
+      this.alpha = 1;
+    }
+  
+    draw() {
+      ctx.save();
+      ctx.globalAlpha = this.alpha;
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+      ctx.fillStyle = this.color;
+      ctx.fill();
+      ctx.restore();
+    }
+  
+    update() {
+      this.draw();
+      this.x = this.x + this.velocity.x;
+      this.y = this.y + this.velocity.y;
+      this.alpha -= 0.01;
+    }
+}
+
+// instance player (mon joueur) et initialise des tableaux de projectiles, ennemis et particules qui seront utilisés dans la fonction animate
 
 const player = new Player(canvas.width / 2, canvas.height / 2, 10, "blue");
 
@@ -85,23 +83,79 @@ const projectiles = [];
 
 const enemies = [];
 
-function animate() {
-    requestAnimationFrame(animate);
+const particles = [];
 
+
+
+// function animate
+let animationId;
+function animate() {
+    animationId = requestAnimationFrame(animate);
+  
     ctx.fillStyle = "rgba(0, 0, 0, 0.1)";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-
+  
     player.draw();
 
+    particles.forEach((particle, index) => {
+        if (particle.alpha <= 0) {
+            particles.splice(index, 1);
+        } else {
+            particle.update();
+        }
+    });
+  
     projectiles.forEach((projectile) => projectile.update());
-
-    enemies.forEach((enemy) => enemy.update());
+  
+    enemies.forEach((enemy, enemyIndex) => {
+    
+        projectiles.forEach((projectile, projectileIndex) => {
+          const distance = Math.hypot(
+            projectile.x - enemy.x,
+            projectile.y - enemy.y
+          );
+          if (distance - projectile.radius - enemy.radius <= 0) {
+// particles creation
+            for (let i = 0; i < 8; i++) {
+              particles.push(
+                new Particle(
+                  projectile.x,
+                  projectile.y,
+                  Math.random() * (3 - 1) + 1,
+                  enemy.color,
+                  {
+                    x: (Math.random() - 0.5) * 3,
+                    y: (Math.random() - 0.5) * 3,
+                  }
+                )
+              );
+            }
+    
+            if (enemy.radius - 10 > 5) {
+              gsap.to(enemy, {
+                radius: enemy.radius - 10,
+              });
+              setTimeout(() => {
+                projectiles.splice(projectileIndex, 1);
+              }, 0);
+            } else {
+              setTimeout(() => {
+                enemies.splice(enemyIndex, 1);
+                projectiles.splice(projectileIndex, 1);
+              }, 0);
+            }
+          }
+        });
+    
+        const distPlayerEnemy = Math.hypot(player.x - enemy.x, player.y - enemy.y);
+        if (distPlayerEnemy - enemy.radius - player.radius <= 0) {
+          cancelAnimationFrame(animationId);
+        }
+        enemy.update();
+    });
 }
-animate();
 
-
-//function spawnEnemies
-
+// function spawnEnemies
 function spawnEnemies() {
     setInterval(() => {
         const radius = Math.random() * (30 - 4) + 4;
@@ -136,4 +190,29 @@ function spawnEnemies() {
         enemies.push(new Enemy(x, y, radius, color, velocity));
     }, 1000);
 }
+
+//J'appelle mes fonctions
+
+animate();
 spawnEnemies();
+
+window.addEventListener("click", (event) => {
+    const angle = Math.atan2(
+        event.clientY - player.y,
+        event.clientX - player.x
+    );
+    const velocity = {
+        x: Math.cos(angle) * 5,
+        y: Math.sin(angle) * 5,
+    };
+
+    const projectile = new Projectile(
+        player.x,
+        player.y,
+        5,
+        "white",
+        velocity
+    );
+    projectiles.push(projectile);
+    projectile.draw();
+});
