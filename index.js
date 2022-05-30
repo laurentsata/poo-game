@@ -34,6 +34,7 @@ class Player extends Entity{
 
 const player = new Player(canvas.width / 2, canvas.height / 2, 10, "red");
 player.draw();
+
 //class projectile
 class Projectile extends Player {
     constructor(x, y, radius, color, velocity) {
@@ -73,3 +74,16 @@ window.addEventListener("click", (event) => {
     projectiles.push(projectile);
     projectile.draw();
 });
+
+//fonction animate
+function animate() {
+    requestAnimationFrame(animate);
+
+    ctx.fillStyle = "rgba(0, 0, 0, 1)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    player.draw();
+
+    projectiles.forEach((projectile) => projectile.update());
+}
+animate();
