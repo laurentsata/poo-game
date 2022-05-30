@@ -32,6 +32,17 @@ class Player extends Entity{
     }
 }
 
+//class enemy
+class Enemy extends Projectile {
+
+    constructor(x, y, radius, color, velocity) {
+
+        super(x, y, radius, color, velocity);
+
+    }
+
+}
+
 const player = new Player(canvas.width / 2, canvas.height / 2, 10, "red");
 player.draw();
 
