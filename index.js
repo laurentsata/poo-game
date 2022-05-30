@@ -32,32 +32,8 @@ class Player extends Entity{
     }
 }
 
-//class enemy
-class Enemy extends Projectile {
-    constructor(x, y, radius, color, velocity) {
-        super(x, y, radius, color, velocity);
-    }
-}
-
-const player = new Player(canvas.width / 2, canvas.height / 2, 10, "blue");
-
-const projectiles = [];
-
-const enemies = [];
-
-function animate() {
-    requestAnimationFrame(animate);
-
-    ctx.fillStyle = "rgba(0, 0, 0, 0.1)";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    player.draw();
-
-    projectiles.forEach((projectile) => projectile.update());
-
-    enemies.forEach((enemy) => enemy.update());
-}
-animate();
+const player = new Player(canvas.width / 2, canvas.height / 2, 10, "red");
+player.draw();
 
 //function spawnEnemies
 
